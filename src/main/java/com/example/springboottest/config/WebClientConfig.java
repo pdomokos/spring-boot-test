@@ -22,43 +22,43 @@ public class WebClientConfig {
     @Value("${test.host}")
     private String testHost;
 
-@Bean
-public WebClient webClient(){
-    return WebClient.builder()
-            .baseUrl(testHost)
-            .defaultCookie("cookieKey", "cookieValue")
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultUriVariables(Collections.singletonMap("url", testHost))
-            .build();
+//@Bean
+//public WebClient webClient(){
+//    return WebClient.builder()
+//            .baseUrl(testHost)
+//            .defaultCookie("cookieKey", "cookieValue")
+//            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//            .defaultUriVariables(Collections.singletonMap("url", testHost))
+//            .build();
+//
+//}
 
-}
+    @Bean
+    public ReactorResourceFactory resourceFactory() {
+        ConnectionProvider provider =
+                ConnectionProvider.builder("test")
+                        .maxConnections(10000)
+                        // Set custom max pending requests
+                        .pendingAcquireMaxCount(100)
+                        .build();
+        LoopResources loop = LoopResources.create("kl-event-loop", 1, 16, true);
+        ReactorResourceFactory factory = new ReactorResourceFactory();
+        factory.setUseGlobalResources(false);
+        factory.setConnectionProvider(provider);
+        factory.setLoopResources(loop);
+        return factory;
+    }
 
-//    @Bean
-//    public ReactorResourceFactory resourceFactory() {
-//        ConnectionProvider provider =
-//                ConnectionProvider.builder("test")
-//                        .maxConnections(45)
-//                        // Set custom max pending requests
-//                        .pendingAcquireMaxCount(4000)
-//                        .build();
-//        LoopResources loop = LoopResources.create("kl-event-loop", 1, 4, true);
-//        ReactorResourceFactory factory = new ReactorResourceFactory();
-//        factory.setUseGlobalResources(false);
-//        factory.setConnectionProvider(provider);
-//        factory.setLoopResources(loop);
-//        return factory;
-//    }
-//
-//    @Bean
-//    public WebClient webClient() {
-//
-//        Function<HttpClient, HttpClient> mapper = client -> client.baseUrl(testHost);
-//
-//        ClientHttpConnector connector =
-//                new ReactorClientHttpConnector(resourceFactory(), mapper);
-//
-//        return WebClient.builder().clientConnector(connector).build();
-//
-//    }
+    @Bean
+    public WebClient webClient() {
+
+        Function<HttpClient, HttpClient> mapper = client -> client.baseUrl(testHost);
+
+        ClientHttpConnector connector =
+                new ReactorClientHttpConnector(resourceFactory(), mapper);
+
+        return WebClient.builder().clientConnector(connector).build();
+
+    }
 
 }
