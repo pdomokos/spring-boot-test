@@ -1,4 +1,4 @@
-package com.example.springboottest.config;
+package com.example.webfluxtest.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,17 +35,17 @@ public class WebClientConfig {
 
     @Bean
     public ReactorResourceFactory resourceFactory() {
-        ConnectionProvider provider =
-                ConnectionProvider.builder("test")
-                        .maxConnections(10000)
-                        // Set custom max pending requests
-                        .pendingAcquireMaxCount(100)
-                        .build();
-        LoopResources loop = LoopResources.create("kl-event-loop", 1, 16, true);
+//        ConnectionProvider provider =
+//                ConnectionProvider.builder("test")
+//                        .maxConnections(10000)
+//                        // Set custom max pending requests
+//                        .pendingAcquireMaxCount(100)
+//                        .build();
+//        LoopResources loop = LoopResources.create("kl-event-loop", 1, 40, true);
         ReactorResourceFactory factory = new ReactorResourceFactory();
-        factory.setUseGlobalResources(false);
-        factory.setConnectionProvider(provider);
-        factory.setLoopResources(loop);
+        factory.setUseGlobalResources(true);
+//        factory.setConnectionProvider(provider);
+//        factory.setLoopResources(loop);
         return factory;
     }
 
